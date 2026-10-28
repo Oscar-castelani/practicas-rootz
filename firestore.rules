@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function correo() { return request.auth.token.email.lower(); }
+    function verificado() { return request.auth != null && request.auth.token.email_verified == true; }
+    function rolDe() { return get(/databases/$(database)/documents/usuarios/$(correo())).data.rol; }
+    function registrado() { return verificado() && exists(/databases/$(database)/documents/usuarios/$(correo())); }
+    function puedeEscribir() { return registrado() && rolDe() in ['editor', 'colaborador']; }
+    function esEditor() { return registrado() && rolDe() == 'editor'; }
+
+    function practicaValida(d) {
+      return d.keys().hasOnly(['prof', 'fecha', 'inicio', 'fin', 'tema', 'estado', 'nota'])
+        && d.keys().hasAll(['prof', 'fecha', 'inicio', 'fin', 'tema', 'estado'])
+        && d.prof is string && d.fecha is string && d.fecha.size() == 10
+        && d.inicio is string && d.fin is string && d.tema is string
+        && d.estado in ['realizada', 'programada']
+        && (!('nota' in d) || (d.nota is string && d.nota.size() <= 200));
+    }
+
+    // Lista de personas autorizadas. Cada documento se crea a mano en la consola de Firebase.
+    // ID del documento = correo en minúsculas. Campo "rol" = editor | colaborador | lector
+    match /usuarios/{email} {
+      allow get: if verificado() && correo() == email;
+      allow list, write: if false;
+    }
+
+    match /practicas/{id} {
+      allow read: if registrado();
+      allow create, update: if puedeEscribir() && practicaValida(request.resource.data);
+      allow delete: if puedeEscribir();
+    }
+
+    // Tareas asignadas a cada profesional: solo los editores
+    match /asignaciones/{id} {
+      allow read: if registrado();
+      allow create, update: if esEditor()
+        && request.resource.data.keys().hasOnly(['temas'])
+        && request.resource.data.temas is list;
+    }
+  }
+}

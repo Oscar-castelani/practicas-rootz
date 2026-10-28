@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prácticas Rootz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Siempre claro: fondo crema y letras oscuras. Identidad Rootz: crema y negro café, serif Richmond Display, mayúsculas con mucho espacio entre letras, botones en píldora. Pestañas por profesional; objetivos y resumen a la izquierda, calendario a la derecha. */
+:root {
+  --bg: #FAF7F2;
+  --surface: #FFFFFF;
+  --ink: #1A1410;
+  --muted: #5E554D;
+  --line: #DDD3C6;
+  --accent: #1A1410;
+  --accent-soft: #F0E7DB;
+  --accent-ink: #1A1410;
+  --on-accent: #FAF7F2;
+  --plan: #8C4F2B;
+  --plan-soft: #F7ECE1;
+  --danger: #A33A2E;
+  --t-slim: #8C5A3C;
+  --t-tapes: #4F6A8A;
+  --t-perfvel: #4E7A66;
+  --t-vel: #9A8240;
+  --t-ondas: #B0647E;
+  --t-ondasnat: #7A5C8C;
+  --font-display: "Richmond Display", Richmond, "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-body: "Richmond Display", Richmond, "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; font-weight: 500; line-height: 1.4; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 20px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.015em; }
+h1 { font-size: 36px; }
+h2 { font-size: 24px; }
+h3 { font-size: 17px; }
+.eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: .18em; color: var(--muted); font-weight: 600; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
+.status { font-size: 14px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.status.off::before { background: var(--plan); }
+
+.tabs { display: flex; gap: 4px; overflow-x: auto; padding-bottom: 2px; border-bottom: 1px solid var(--line); margin-bottom: 20px; scrollbar-width: thin; }
+.tab { flex: none; background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 14px; color: var(--muted); font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: .14em; margin-bottom: -1px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--accent-ink); border-bottom-color: var(--accent); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 800px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 18px; min-width: 0; }
+
+.goal { display: flex; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.goal:first-of-type { border-top: 0; }
+.swatch { flex: none; width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; }
+.goal b { display: block; font-weight: 600; }
+.goal span { color: var(--muted); font-size: 15px; }
+
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.kpi .v { font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi .l { font-size: 14px; color: var(--muted); }
+.kpi .s { font-size: 14px; color: var(--plan); }
+.bars { display: flex; flex-direction: column; gap: 8px; }
+.bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; font-size: 15px; }
+.bar .track { grid-column: 1 / -1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 3px; }
+.bar .t { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.calbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+.calbar .sp { flex: 1; }
+.btn { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 7px 16px; font-weight: 600; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; }
+.btn.small { padding: 4px 9px; font-size: 15px; }
+.btn.danger { color: var(--danger); }
+select, input { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 7px 10px; min-width: 0; }
+.dow, .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.dow div { text-align: center; font-size: 14px; text-transform: uppercase; color: var(--muted); font-weight: 600; padding-bottom: 2px; }
+.day { width: 100%; min-width: 0; min-height: 58px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); padding: 4px 5px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; text-align: left; position: relative; }
+.day.blank { border: 0; background: none; pointer-events: none; }
+.day .n { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.day .h { font-size: 12px; color: var(--accent-ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+.day .dots { display: flex; gap: 3px; min-height: 6px; }
+.day .dots i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+.day.today .n { background: var(--ink); color: var(--bg); border-radius: 4px; padding: 0 4px; }
+.day.done { background: var(--accent-soft); border-color: var(--accent); }
+.day.plan { background: var(--plan-soft); border: 1.5px dashed var(--plan); }
+.day.plan .h { color: var(--plan); }
+.day.sel { outline: 2px solid var(--ink); outline-offset: 1px; }
+.day:not(.blank):hover { border-color: var(--accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 14px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .k { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--accent); background: var(--accent-soft); }
+.legend .k.p { border: 1.5px dashed var(--plan); background: var(--plan-soft); }
+
+.tip { position: fixed; z-index: 30; background: var(--ink); color: var(--bg); border-radius: 4px; padding: 8px 10px; font-size: 15px; max-width: 260px; pointer-events: none; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.tip b { display: block; margin-bottom: 2px; }
+.tip div + div { margin-top: 2px; }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); white-space: nowrap; }
+.chip i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+.badge { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .1em; }
+.badge.done { background: var(--accent-soft); color: var(--accent-ink); }
+.badge.plan { background: var(--plan-soft); color: var(--plan); }
+
+.list { display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 6px 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: center; }
+.row:first-child { border-top: 0; }
+.row .d { font-weight: 600; font-variant-numeric: tabular-nums; }
+.row .d small { display: block; color: var(--muted); font-weight: 400; font-size: 14px; }
+.row .m { min-width: 0; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+.row .note { flex-basis: 100%; color: var(--muted); font-size: 15px; overflow-wrap: anywhere; }
+.row .act { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-start; align-items: center; }
+@media (max-width: 560px) { .row { grid-template-columns: minmax(0, 1fr); } }
+
+.form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; align-items: end; }
+.form label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; min-width: 0; }
+.form .wide { grid-column: 1 / -1; }
+.form .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.msg { font-size: 15px; color: var(--danger); }
+.empty { color: var(--muted); padding: 8px 0; }
+.note-ro { font-size: 15px; color: var(--muted); }
+
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 10px 12px 10px 0; border-top: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 13px; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); border-top: 0; }
+td.num, th.num { text-align: right; }
+tr.go { cursor: pointer; }
+tr.go:hover td { background: var(--accent-soft); }
+td .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+tfoot td { font-weight: 700; }
+
+.panel.rel { position: relative; }
+.goalhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.menubtn { display: inline-flex; align-items: center; gap: 10px; }
+.burger { display: inline-block; width: 16px; height: 2px; background: currentColor; box-shadow: 0 5px 0 currentColor, 0 -5px 0 currentColor; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.tag { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--accent-soft); border-radius: 999px; padding: 4px 12px; font-weight: 700; font-size: 16px; }
+.tag i { width: 9px; height: 9px; border-radius: 50%; display: block; flex: none; }
+.tag .x { border: 0; background: none; font-size: 20px; line-height: 1; padding: 0 6px; margin-right: -8px; color: var(--muted); border-radius: 999px; }
+.tag .x:hover { color: var(--danger); }
+.menu { position: absolute; right: 12px; top: 64px; z-index: 20; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; box-shadow: 0 12px 32px rgba(26,20,16,.2); padding: 6px; width: min(380px, calc(100% - 24px)); max-height: 70vh; overflow: auto; }
+.mi { display: flex; gap: 12px; width: 100%; text-align: left; background: none; border: 0; padding: 9px 8px; border-radius: 4px; align-items: flex-start; }
+.mi:hover { background: var(--accent-soft); }
+.mi b { display: block; font-weight: 700; }
+.mi small { display: block; color: var(--muted); font-size: 14px; line-height: 1.3; }
+.box { flex: none; width: 20px; height: 20px; border: 1.5px solid var(--ink); border-radius: 3px; display: grid; place-items: center; font-size: 14px; margin-top: 2px; }
+.box.on { background: var(--ink); color: var(--bg); }
+.lhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+.hback { position: fixed; inset: 0; z-index: 40; background: rgba(26,20,16,.5); display: flex; justify-content: center; align-items: flex-start; overflow: auto; padding-block: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.hist .row { grid-template-columns: 170px minmax(0, 1fr); }
+@media (max-width: 560px) { .hist .row { grid-template-columns: minmax(0, 1fr); } }
+.hback[hidden] { display: none; }
+.who { font-size: 13px; color: var(--muted); text-align: right; overflow-wrap: anywhere; }
+.who a { color: var(--accent-ink); font-weight: 700; }
+.hist { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; width: min(780px, 100%); padding: 18px; min-width: 0; }
+.hhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.hfilters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 8px; }
+.hfilters label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; min-width: 0; }
+.hbar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 10px 0; border-block: 1px solid var(--line); margin-block: 8px; font-size: 15px; }
+.hbar .sp { flex: 1; }
+.cb { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.cb input { width: 18px; height: 18px; padding: 0; accent-color: var(--ink); }
+.hcount { color: var(--muted); font-size: 15px; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+.gate { max-width: 460px; margin: 0 auto; padding: 14vh 16px 40px; text-align: center; }
+.gate h1 { margin: 6px 0 14px; }
+.gate p { color: var(--muted); margin: 0 0 18px; overflow-wrap: anywhere; }
+.gate .btn { padding: 10px 22px; font-size: 17px; }
+.gate .row2 { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate"><div class="eyebrow">Rootz · Formación del equipo</div><h1>Prácticas Rootz</h1><p>Cargando…</p></div>
+
+
+<div class="wrap" id="app" hidden>
+  <header>
+    <div>
+      <div class="eyebrow">Rootz · Formación del equipo</div>
+      <h1>Prácticas Rootz</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0"><div id="status" class="status off">Conectando…</div><div id="who" class="who" hidden></div></div>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Profesionales"></nav>
+  <main id="view"></main>
+</div>
+<div id="tip" class="tip" role="tooltip" hidden></div>
+<div id="hist" class="hback" hidden></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithPopup, signInWithRedirect, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, collection, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCP_8-FWArYZiikBp-0mIaeP7fwL5wMGpg",
+  authDomain: "practicas-rootz.firebaseapp.com",
+  projectId: "practicas-rootz",
+  storageBucket: "practicas-rootz.firebasestorage.app",
+  messagingSenderId: "499219840206",
+  appId: "1:499219840206:web:63d698ab9e42f38702249f"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const fs = getFirestore(fbApp);
+
+/* ---------- pantalla de ingreso ---------- */
+const gate = document.getElementById("gate");
+function showGate(html) { document.getElementById("app").hidden = true; document.getElementById("hist").hidden = true; gate.hidden = false; gate.innerHTML = html; }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+const head = '<div class="eyebrow">Rootz · Formación del equipo</div><h1>Prácticas Rootz</h1>';
+window.__signOut = () => signOut(auth);
+
+function loginScreen(msg) {
+  showGate(head + '<p>' + esc(msg || "Ingresá con tu cuenta de Google para ver y registrar las prácticas.") + '</p><div class="row2"><button class="btn primary" id="gbtn" type="button">Ingresar con Google</button></div>');
+  document.getElementById("gbtn").onclick = async () => {
+    const prov = new GoogleAuthProvider(); prov.setCustomParameters({ prompt: "select_account" });
+    try { await signInWithPopup(auth, prov); }
+    catch (e) {
+      if (e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) { try { await signInWithRedirect(auth, prov); } catch (e2) { loginScreen("No se pudo iniciar sesión. Probá de nuevo."); } }
+      else if (e && e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") loginScreen("No se pudo iniciar sesión. Probá de nuevo.");
+    }
+  };
+}
+function noAccessScreen(email) {
+  showGate(head + '<p>La cuenta <b>' + esc(email) + '</b> no tiene acceso. Pedí que te agreguen o ingresá con otra cuenta.</p><div class="row2"><button class="btn primary" id="swbtn" type="button">Cambiar de cuenta</button></div>');
+  document.getElementById("swbtn").onclick = () => signOut(auth);
+}
+
+/* ---------- base de datos con la misma interfaz que usa la herramienta ---------- */
+function wrapErr(e) { const err = new Error(e && e.message); err.code = e && e.code === "permission-denied" ? "permission-denied" : (e && e.code); throw err; }
+function ref(r) { return { update: d => updateDoc(r, d).catch(wrapErr), delete: () => deleteDoc(r).catch(wrapErr), set: d => setDoc(r, d).catch(wrapErr) }; }
+const dbShim = {
+  collection(name) {
+    const c = collection(fs, name);
+    return {
+      onSnapshot(next, err) { return onSnapshot(c, snap => next({ docs: snap.docs.map(d => ({ id: d.id, data: () => d.data() })) }), e => err && err(e)); },
+      add: d => addDoc(c, d).catch(wrapErr),
+      doc: id => ref(doc(fs, name, id))
+    };
+  },
+  doc: path => ref(doc(fs, ...path.split("/")))
+};
+
+let started = false, currentUid = null;
+function installShim(user, rol) {
+  const canWrite = rol === "editor" || rol === "colaborador";
+  window.claude = { use: async (name) => {
+    if (name === "db") return dbShim;
+    if (name === "user") return {
+      can: async () => canWrite,
+      canEdit: async () => rol === "editor",
+      isOwner: () => false,
+      me: async () => ({ email: user.email, name: user.displayName || "", id: user.uid })
+    };
+    return null;
+  } };
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    if (started) { location.reload(); return; }
+    currentUid = null; loginScreen(); return;
+  }
+  if (started && currentUid === user.uid) return;
+  showGate(head + "<p>Comprobando acceso…</p>");
+  let rol = null;
+  try {
+    const snap = await getDoc(doc(fs, "usuarios", String(user.email || "").toLowerCase()));
+    if (snap.exists()) rol = snap.data().rol;
+  } catch (e) { rol = null; }
+  if (rol !== "editor" && rol !== "colaborador" && rol !== "lector") { noAccessScreen(user.email); return; }
+  if (started) { location.reload(); return; }
+  started = true; currentUid = user.uid;
+  installShim(user, rol);
+  gate.hidden = true; document.getElementById("app").hidden = false;
+  startApp();
+});
+
+/* ---------- la herramienta ---------- */
+function startApp() {
+  var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  var DIAS = ["dom","lun","mar","mié","jue","vie","sáb"];
+  var TEMAS = {
+    slim:      { n: "Slim", d: "Práctica de colocación de slim", c: "var(--t-slim)" },
+    tapes:     { n: "Colocación de tapes", d: "Práctica de colocación de tapes", c: "var(--t-tapes)" },
+    perfvel:   { n: "Perfeccionamiento y velocidad 4/5 paq.", d: "Práctica de perfeccionamiento y velocidad de colocación de tapes 4 y 5 paquetes", c: "var(--t-perfvel)" },
+    velocidad: { n: "Velocidad 4/5 paq.", d: "Práctica de velocidad de colocación de paquetes 4 y 5", c: "var(--t-vel)" },
+    ondas:     { n: "Ondas", d: "Práctica de ondas", c: "var(--t-ondas)" },
+    ondasnat:  { n: "Ondas con cabello natural", d: "Práctica de ondas: integración de cabello natural con extensiones", c: "var(--t-ondasnat)" }
+  };
+  var TEMA_IDS = ["tapes", "perfvel", "velocidad", "ondas", "ondasnat", "slim"];
+  var PROS = [
+    { id: "antonella", nombre: "Antonella", def: ["slim"] },
+    { id: "matias",    nombre: "Matías",    def: ["slim", "ondasnat"] },
+    { id: "joni",      nombre: "Joni",      def: ["slim", "perfvel"] },
+    { id: "paola",     nombre: "Paola",     def: ["slim"] },
+    { id: "bruno",     nombre: "Bruno",     def: ["slim", "perfvel"] },
+    { id: "daniel",    nombre: "Daniel",    def: ["slim", "perfvel"] },
+    { id: "sandra",    nombre: "Sandra",    def: ["ondasnat", "perfvel"] },
+    { id: "alicia",    nombre: "Alicia",    def: ["ondasnat"] },
+    { id: "estefi",    nombre: "Estefi",    def: ["velocidad"] }
+  ];
+
+  var now = new Date();
+  var S = {
+    tab: "equipo", y: now.getFullYear(), m: now.getMonth(), sel: null, edit: null, confirmDel: null,
+    rows: [], canWrite: true, canTasks: true, hist: false, hf: { mes: "", tema: "", estado: "" }, hsel: {}, hconf: null, db: null, col: null, local: false, asig: {}, q: Promise.resolve(), menu: false
+  };
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function ymd(y, m, d) { return y + "-" + pad(m + 1) + "-" + pad(d); }
+  function today() { var t = new Date(); return ymd(t.getFullYear(), t.getMonth(), t.getDate()); }
+  function toMin(t) { var p = String(t || "").split(":"); return (+p[0]) * 60 + (+p[1] || 0); }
+  function dur(r) { return Math.max(0, toMin(r.fin) - toMin(r.inicio)); }
+  function fmt(min) { var h = Math.floor(min / 60), m = min % 60; if (!h) return m + " min"; if (!m) return h + " h"; return h + " h " + m + " min"; }
+  function fmtH(min) { return (Math.round(min / 6) / 10).toString().replace(".", ",") + " h"; }
+  function parseYmd(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function longDate(s) { var d = parseYmd(s); return DIAS[d.getDay()] + " " + d.getDate() + " " + MESES[d.getMonth()].slice(0, 3); }
+  function tm(t) { return TEMAS[t] || { n: String(t), d: "", c: "var(--muted)" }; }
+  function temasOf(p) { return Array.isArray(S.asig[p.id]) ? S.asig[p.id] : p.def; }
+  function chipHtml(t) { var x = tm(t); return '<span class="chip"><i style="background:' + x.c + '"></i>' + esc(x.n) + "</span>"; }
+  function usedTemas(p, rs) { var a = temasOf(p).slice(); rs.forEach(function (r) { if (a.indexOf(r.tema) < 0) a.push(r.tema); }); return a; }
+  function proById(id) { return PROS.filter(function (p) { return p.id === id; })[0]; }
+  function monthPrefix() { return S.y + "-" + pad(S.m + 1); }
+  function rowsOf(profId) {
+    var pre = monthPrefix();
+    return S.rows.filter(function (r) { return r.prof === profId && String(r.fecha).indexOf(pre) === 0; })
+      .sort(function (a, b) { return (a.fecha + a.inicio) < (b.fecha + b.inicio) ? -1 : 1; });
+  }
+  function sum(rows, estado) { return rows.filter(function (r) { return r.estado === estado; }).reduce(function (a, r) { return a + dur(r); }, 0); }
+  function daysDone(rows) { var o = {}; rows.forEach(function (r) { if (r.estado === "realizada") o[r.fecha] = 1; }); return Object.keys(o).length; }
+
+  /* ---------- status ---------- */
+  function setStatus() {
+    var el = $("status");
+    if (!S.db) { el.className = "status off"; el.textContent = "Sin base de datos: los cambios no se guardan"; }
+    else if (!S.canWrite) { el.className = "status"; el.textContent = "Solo lectura"; }
+    else { el.className = "status"; el.textContent = "Guardado para todo el equipo"; }
+  }
+
+  /* ---------- store ---------- */
+  function save(data, id) {
+    if (!S.db) {
+      if (id) { S.rows = S.rows.map(function (r) { return r.id === id ? Object.assign({}, r, data) : r; }); }
+      else { S.rows = S.rows.concat([Object.assign({ id: "l" + Date.now() }, data)]); }
+      paint(); return Promise.resolve();
+    }
+    var p = id ? S.col.doc(id).update(data) : S.col.add(data);
+    return p.catch(function (e) { if (e && (e.code === "invalid_argument" || e.code === "permission-denied")) { S.canWrite = false; setStatus(); route(); } throw e; });
+  }
+  function remove(id) {
+    if (!S.db) { S.rows = S.rows.filter(function (r) { return r.id !== id; }); paint(); return Promise.resolve(); }
+    return S.col.doc(id).delete();
+  }
+
+  /* ---------- tabs ---------- */
+  function buildTabs() {
+    var items = [{ id: "equipo", nombre: "Equipo" }].concat(PROS);
+    $("tabs").innerHTML = items.map(function (p) {
+      return '<button class="tab" role="tab" data-t="' + p.id + '" aria-selected="' + (S.tab === p.id) + '">' + esc(p.nombre) + "</button>";
+    }).join("");
+  }
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".tab"); if (!b) return;
+    location.hash = b.getAttribute("data-t");
+  });
+  function readHash() {
+    var h = (location.hash || "").replace("#", "");
+    S.tab = (h === "equipo" || proById(h)) ? h : "equipo";
+  }
+
+  /* ---------- month bar ---------- */
+  function monthBar() {
+    var yrs = []; for (var y = now.getFullYear() - 1; y <= now.getFullYear() + 1; y++) yrs.push(y);
+    if (yrs.indexOf(S.y) < 0) yrs.push(S.y);
+    return '<div class="calbar">' +
+      '<button class="btn" id="prev" aria-label="Mes anterior">←</button>' +
+      '<select id="selm" aria-label="Mes">' + MESES.map(function (n, i) { return '<option value="' + i + '"' + (i === S.m ? " selected" : "") + ">" + n + "</option>"; }).join("") + "</select>" +
+      '<select id="sely" aria-label="Año">' + yrs.sort().map(function (y) { return '<option' + (y === S.y ? " selected" : "") + ">" + y + "</option>"; }).join("") + "</select>" +
+      '<button class="btn" id="next" aria-label="Mes siguiente">→</button>' +
+      '<span class="sp"></span><button class="btn" id="hoy">Hoy</button></div>';
+  }
+  function bindMonthBar() {
+    function go(y, m) { S.y = y; S.m = m; S.sel = null; S.confirmDel = null; paint(); syncBar(); }
+    function syncBar() { $("selm").value = S.m; $("sely").value = S.y; }
+    $("prev").onclick = function () { var d = new Date(S.y, S.m - 1, 1); go(d.getFullYear(), d.getMonth()); };
+    $("next").onclick = function () { var d = new Date(S.y, S.m + 1, 1); go(d.getFullYear(), d.getMonth()); };
+    $("hoy").onclick = function () { var t = new Date(); go(t.getFullYear(), t.getMonth()); if (S.tab !== "equipo") { S.sel = today(); paint(); setFormDate(S.sel); } };
+    $("selm").onchange = function () { go(S.y, +$("selm").value); };
+    $("sely").onchange = function () { go(+$("sely").value, S.m); };
+  }
+
+  /* ---------- routing ---------- */
+  function route() {
+    readHash(); buildTabs(); S.edit = null; S.confirmDel = null; S.sel = null; S.menu = false; closeHist();
+    if (S.tab === "equipo") renderTeam(); else renderPro(proById(S.tab));
+    paint();
+  }
+  function paint() {
+    if (S.tab === "equipo") paintTeam(); else { paintPro(proById(S.tab)); if (S.hist) paintHistList(); }
+  }
+
+  /* ---------- team ---------- */
+  function renderTeam() {
+    $("view").innerHTML = '<div class="panel"><div class="eyebrow">Resumen del equipo</div>' +
+      '<h2 style="margin-bottom:12px">Prácticas del mes</h2>' + monthBar() +
+      '<div class="tablewrap" id="teamtable"></div></div>';
+    bindMonthBar();
+  }
+  function paintTeam() {
+    var tot = { d: 0, r: 0, p: 0 };
+    var body = PROS.map(function (p) {
+      var rs = rowsOf(p.id), d = daysDone(rs), r = sum(rs, "realizada"), pl = sum(rs, "programada");
+      tot.d += d; tot.r += r; tot.p += pl;
+      return '<tr class="go" data-go="' + p.id + '" tabindex="0"><td><b>' + esc(p.nombre) + '</b></td>' +
+        '<td><div class="chips">' + (temasOf(p).map(chipHtml).join("") || '<span class="note-ro">Sin tareas</span>') + "</div></td>" +
+        '<td class="num">' + d + '</td><td class="num">' + (r ? fmt(r) : "—") + '</td><td class="num">' + (pl ? fmt(pl) : "—") + "</td></tr>";
+    }).join("");
+    $("teamtable").innerHTML = '<table><thead><tr><th>Profesional</th><th>Qué practica</th><th class="num">Días</th><th class="num">Horas realizadas</th><th class="num">Horas programadas</th></tr></thead><tbody>' + body +
+      '</tbody><tfoot><tr><td colspan="2">Total del equipo</td><td class="num">' + tot.d + '</td><td class="num">' + (tot.r ? fmt(tot.r) : "—") + '</td><td class="num">' + (tot.p ? fmt(tot.p) : "—") + "</td></tr></tfoot></table>";
+    var trs = $("teamtable").querySelectorAll("tr.go");
+    Array.prototype.forEach.call(trs, function (tr) {
+      var go = function () { location.hash = tr.getAttribute("data-go"); };
+      tr.onclick = go; tr.onkeydown = function (e) { if (e.key === "Enter") go(); };
+    });
+  }
+
+  /* ---------- professional ---------- */
+  function renderPro(p) {
+    var form = S.canWrite ?
+      '<div class="panel"><h2 id="ftitle" style="margin-bottom:12px">Registrar práctica</h2>' +
+      '<form class="form" id="form" autocomplete="off">' +
+      '<label>Fecha<input type="date" id="f-fecha" required></label>' +
+      '<label>Inicio<input type="time" id="f-ini" value="10:00" required></label>' +
+      '<label>Fin<input type="time" id="f-fin" value="12:00" required></label>' +
+      '<label>Tarea<select id="f-tema"></select></label>' +
+      '<label>Estado<select id="f-estado"><option value="realizada">Realizada</option><option value="programada">Programada</option></select></label>' +
+      '<label class="wide">Nota (opcional)<input type="text" id="f-nota" maxlength="200" placeholder="Por ejemplo: modelo de práctica, qué salió bien, qué repetir"></label>' +
+      '<div class="actions wide"><button class="btn primary" type="submit" id="fsave">Guardar práctica</button>' +
+      '<button class="btn" type="button" id="fcancel" hidden>Cancelar edición</button><span class="msg" id="fmsg" role="alert"></span></div></form></div>'
+      : '<div class="panel note-ro">Tu acceso es de solo lectura. Para registrar prácticas hace falta permiso de colaborador.<div class="actions" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn small" id="recheck" type="button">Volver a comprobar permisos</button><small>' + esc(S.diag || "") + '</small></div></div>';
+
+    $("view").innerHTML =
+      '<div class="grid"><div class="stack">' +
+        '<div class="panel rel"><div class="goalhead"><div><div class="eyebrow">Tareas para practicar</div><h2>' + esc(p.nombre) + "</h2></div>" +
+        (S.canTasks ? '<button class="btn menubtn" id="tbtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="tmenu"><span class="burger" aria-hidden="true"></span>Tareas</button>' : "") +
+        '</div><div class="tags" id="tags"></div><div class="menu" id="tmenu" role="menu" hidden></div></div>' +
+        '<div class="panel"><div class="eyebrow" id="mlabel" style="margin-bottom:10px"></div><div class="kpis" id="kpis"></div><div class="bars" id="bars"></div></div>' +
+      "</div><div class=\"stack\">" +
+        '<div class="panel">' + monthBar() + '<div class="dow">' + ["L","M","M","J","V","S","D"].map(function (x) { return "<div>" + x + "</div>"; }).join("") + '</div><div class="days" id="days"></div>' +
+        '<div class="legend"><span><i class="k"></i>Práctica realizada</span><span><i class="k p"></i>Programada</span><span id="legtemas" style="display:contents"></span></div></div>' +
+        form +
+        '<div class="panel"><div class="lhead"><h2 id="ltitle"></h2><button class="btn small" id="hbtn" type="button">Historial</button></div><div class="list" id="list"></div></div>' +
+      "</div></div>";
+    bindMonthBar();
+    if (S.canWrite) bindForm(p); else if ($("recheck")) $("recheck").onclick = function () { if (S.recheck) S.recheck(); };
+    if (S.canTasks) $("tbtn").onclick = function () { S.menu = !S.menu; syncMenu(); };
+    $("hbtn").onclick = function () { openHist(p); };
+  }
+  function syncMenu() {
+    var m = $("tmenu"), b = $("tbtn"); if (!m) return;
+    m.hidden = !S.menu || !S.canTasks; if (b) b.setAttribute("aria-expanded", String(S.menu));
+  }
+  function toggleTema(p, t, on) {
+    if (!S.canTasks) return;
+    var cur = temasOf(p).slice(), i = cur.indexOf(t);
+    if (on && i < 0) cur.push(t);
+    if (!on && i >= 0) cur.splice(i, 1);
+    S.asig[p.id] = cur; paint();
+    if (!S.db) return;
+    var ref = S.db.doc("asignaciones/" + p.id);
+    S.q = S.q.then(function () { return ref.set({ temas: S.asig[p.id] }); }).catch(function (e) {
+      if (e && (e.code === "invalid_argument" || e.code === "permission-denied")) { S.canWrite = false; setStatus(); route(); }
+    });
+  }
+  function paintGoals(p) {
+    var ts = temasOf(p);
+    $("tags").innerHTML = ts.length ? ts.map(function (t) {
+      var x = tm(t);
+      return '<span class="tag" title="' + esc(x.d) + '"><i style="background:' + x.c + '"></i>' + esc(x.n) +
+        (S.canTasks ? '<button class="x" type="button" data-rm="' + t + '" aria-label="Quitar ' + esc(x.n) + '">×</button>' : "") + "</span>";
+    }).join("") : '<div class="empty">Sin tareas asignadas.' + (S.canTasks ? " Agregalas desde el menú Tareas." : " Pedí a quien administra las tareas que las asigne.") + "</div>";
+    $("tags").onclick = function (e) { var b = e.target.closest("[data-rm]"); if (b) toggleTema(p, b.getAttribute("data-rm"), false); };
+    if (S.canTasks && $("tmenu")) {
+      $("tmenu").innerHTML = TEMA_IDS.map(function (t) {
+        var x = tm(t), on = ts.indexOf(t) >= 0;
+        return '<button type="button" class="mi" role="menuitemcheckbox" aria-checked="' + on + '" data-t="' + t + '"><span class="box' + (on ? " on" : "") + '">' + (on ? "✓" : "") + "</span><span><b>" + esc(x.n) + "</b><small>" + esc(x.d) + "</small></span></button>";
+      }).join("");
+      $("tmenu").onclick = function (e) { var b = e.target.closest(".mi"); if (b) { var t = b.getAttribute("data-t"); toggleTema(p, t, ts.indexOf(t) < 0); } };
+      syncMenu();
+    }
+  }
+  function refreshSelect(p) {
+    var sel = $("f-tema"); if (!sel) return;
+    var cur = sel.value, ts = temasOf(p).slice();
+    if (S.edit) { var x = S.rows.filter(function (r) { return r.id === S.edit; })[0]; if (x && ts.indexOf(x.tema) < 0) ts.push(x.tema); }
+    var html = ts.length ? ts.map(function (t) { return '<option value="' + t + '">' + esc(tm(t).n) + "</option>"; }).join("") : '<option value="">Sin tareas asignadas</option>';
+    if (sel.getAttribute("data-sig") !== html) { sel.innerHTML = html; sel.setAttribute("data-sig", html); if (cur && ts.indexOf(cur) >= 0) sel.value = cur; }
+  }
+
+  function setFormDate(v) { var f = $("f-fecha"); if (f && !S.edit) f.value = v; }
+
+  function paintPro(p) {
+    if (!$("days")) return;
+    var rs = rowsOf(p.id);
+    paintGoals(p); refreshSelect(p);
+    $("mlabel").textContent = "Resumen de " + MESES[S.m] + " " + S.y;
+    var r = sum(rs, "realizada"), pl = sum(rs, "programada");
+    $("kpis").innerHTML =
+      '<div class="kpi"><div class="v">' + daysDone(rs) + '</div><div class="l">días de práctica</div></div>' +
+      '<div class="kpi"><div class="v">' + (r ? fmt(r) : "0 h") + '</div><div class="l">horas realizadas</div>' + (pl ? '<div class="s">+ ' + fmt(pl) + " programadas</div>" : "") + "</div>";
+    var ut = usedTemas(p, rs);
+    var mx = Math.max.apply(null, ut.map(function (t) { return sum(rs.filter(function (x) { return x.tema === t; }), "realizada"); }).concat([1]));
+    $("bars").innerHTML = ut.map(function (t) {
+      var v = sum(rs.filter(function (x) { return x.tema === t; }), "realizada");
+      return '<div class="bar"><span>' + esc(tm(t).n) + '</span><span class="t">' + (v ? fmt(v) : "—") + '</span><div class="track"><div class="fill" style="width:' + Math.round(v / mx * 100) + "%;background:" + tm(t).c + '"></div></div></div>';
+    }).join("");
+    $("legtemas").innerHTML = ut.map(function (t) { return '<span><i style="width:8px;height:8px;border-radius:50%;background:' + tm(t).c + '"></i>' + esc(tm(t).n) + "</span>"; }).join("");
+
+    /* calendar */
+    var first = new Date(S.y, S.m, 1), lead = (first.getDay() + 6) % 7, nd = new Date(S.y, S.m + 1, 0).getDate(), td = today();
+    var by = {}; rs.forEach(function (x) { (by[x.fecha] = by[x.fecha] || []).push(x); });
+    var html = "";
+    for (var i = 0; i < lead; i++) html += '<div class="day blank"></div>';
+    for (var d = 1; d <= nd; d++) {
+      var k = ymd(S.y, S.m, d), list = by[k] || [];
+      var done = list.filter(function (x) { return x.estado === "realizada"; });
+      var cls = "day" + (done.length ? " done" : list.length ? " plan" : "") + (k === td ? " today" : "") + (k === S.sel ? " sel" : "");
+      var minutes = list.reduce(function (a, x) { return a + dur(x); }, 0);
+      var seen = {}; var dots = list.filter(function (x) { if (seen[x.tema]) return false; seen[x.tema] = 1; return true; })
+        .map(function (x) { return '<i style="background:' + tm(x.tema).c + '"></i>'; }).join("");
+      html += '<button class="' + cls + '" data-d="' + k + '" aria-label="' + esc(longDate(k)) + (list.length ? ", " + list.length + " práctica(s)" : "") + '"><span class="n">' + d + "</span>" +
+        '<span class="h">' + (minutes ? fmtH(minutes) : "") + '</span><span class="dots">' + dots + "</span></button>";
+    }
+    $("days").innerHTML = html;
+    Array.prototype.forEach.call($("days").querySelectorAll(".day:not(.blank)"), function (b) {
+      var k = b.getAttribute("data-d");
+      b.onmouseenter = function () { showTip(b, by[k]); };
+      b.onfocus = function () { showTip(b, by[k]); };
+      b.onmouseleave = hideTip; b.onblur = hideTip;
+      b.onclick = function () { S.sel = (S.sel === k ? null : k); paint(); if (S.sel) setFormDate(S.sel); };
+    });
+
+    /* list */
+    var shown = S.sel ? rs.filter(function (x) { return x.fecha === S.sel; }) : rs;
+    $("ltitle").textContent = S.sel ? "Prácticas del " + longDate(S.sel) : "Prácticas de " + MESES[S.m];
+    if (!shown.length) {
+      $("list").innerHTML = '<div class="empty">' + (S.sel ? "No hay prácticas este día. Completá el formulario de abajo para sumar una." : "Todavía no hay prácticas en " + MESES[S.m] + ". Registrá la primera con el formulario de abajo.") + "</div>";
+    } else {
+      $("list").innerHTML = shown.map(function (x) {
+        var t = tm(x.tema);
+        var acts = "";
+        if (S.canWrite) {
+          if (S.confirmDel === x.id) acts = '<span>¿Eliminar?</span><button class="btn small danger" data-a="del-yes" data-id="' + x.id + '">Sí, eliminar</button><button class="btn small" data-a="del-no">No</button>';
+          else acts = (x.estado === "programada" ? '<button class="btn small" data-a="ok" data-id="' + x.id + '">Marcar realizada</button>' : "") +
+            '<button class="btn small" data-a="edit" data-id="' + x.id + '">Editar</button><button class="btn small danger" data-a="del" data-id="' + x.id + '">Eliminar</button>';
+        }
+        return '<div class="row"><div class="d">' + esc(longDate(x.fecha)) + "<small>" + esc(x.inicio) + " – " + esc(x.fin) + '</small></div><div class="m">' +
+          '<span class="chip"><i style="background:' + t.c + '"></i>' + esc(t.n) + "</span><span>" + fmt(dur(x)) + '</span><span class="badge ' + (x.estado === "realizada" ? "done" : "plan") + '">' + (x.estado === "realizada" ? "Realizada" : "Programada") + "</span>" +
+          (x.nota ? '<span class="note">' + esc(x.nota) + "</span>" : "") + '</div><div class="act">' + acts + "</div></div>";
+      }).join("");
+    }
+    Array.prototype.forEach.call($("list").querySelectorAll("button[data-a]"), function (b) {
+      b.onclick = function () {
+        var a = b.getAttribute("data-a"), id = b.getAttribute("data-id");
+        if (a === "del") { S.confirmDel = id; paint(); }
+        else if (a === "del-no") { S.confirmDel = null; paint(); }
+        else if (a === "del-yes") { S.confirmDel = null; remove(id).catch(function () {}); }
+        else if (a === "ok") { save({ estado: "realizada" }, id).catch(function () {}); }
+        else if (a === "edit") { startEdit(id); }
+      };
+    });
+  }
+
+  /* ---------- form ---------- */
+  function bindForm(p) {
+    var f = $("form");
+    $("f-fecha").value = today();
+    $("f-estado").value = "realizada";
+    f.onsubmit = function (e) {
+      e.preventDefault();
+      var msg = $("fmsg"); msg.textContent = "";
+      var data = { prof: p.id, fecha: $("f-fecha").value, inicio: $("f-ini").value, fin: $("f-fin").value, tema: $("f-tema").value, estado: $("f-estado").value, nota: $("f-nota").value.trim() };
+      if (!data.tema) { msg.textContent = "Elegí una tarea. Si no hay ninguna, hay que asignarlas desde el menú Tareas."; return; }
+      if (!data.fecha || !data.inicio || !data.fin) { msg.textContent = "Completá fecha, hora de inicio y hora de fin."; return; }
+      if (toMin(data.fin) <= toMin(data.inicio)) { msg.textContent = "La hora de fin tiene que ser posterior a la de inicio."; return; }
+      var btn = $("fsave"); btn.disabled = true;
+      var id = S.edit;
+      save(data, id).then(function () {
+        var d = parseYmd(data.fecha); S.y = d.getFullYear(); S.m = d.getMonth(); S.edit = null; S.sel = data.fecha;
+        resetForm(); renderKeepForm(p);
+      }).catch(function () { msg.textContent = "No se pudo guardar. Probá de nuevo en un momento."; }).then(function () { btn.disabled = false; });
+    };
+    $("fcancel").onclick = function () { S.edit = null; resetForm(); };
+  }
+  function renderKeepForm(p) {
+    var sy = $("sely"), sm = $("selm");
+    if (sy) { if (!Array.prototype.some.call(sy.options, function (o) { return +o.value === S.y; })) { var o = document.createElement("option"); o.textContent = S.y; sy.appendChild(o); } sy.value = S.y; }
+    if (sm) sm.value = S.m;
+    paint();
+  }
+  function resetForm() {
+    $("ftitle").textContent = "Registrar práctica"; $("fsave").textContent = "Guardar práctica"; $("fcancel").hidden = true;
+    $("f-nota").value = ""; $("f-fecha").value = S.sel || today(); $("fmsg").textContent = ""; refreshSelect(proById(S.tab));
+  }
+  function startEdit(id) {
+    var x = S.rows.filter(function (r) { return r.id === id; })[0]; if (!x) return;
+    S.edit = id; refreshSelect(proById(S.tab));
+    $("f-fecha").value = x.fecha; $("f-ini").value = x.inicio; $("f-fin").value = x.fin; $("f-tema").value = x.tema; $("f-estado").value = x.estado; $("f-nota").value = x.nota || "";
+    $("ftitle").textContent = "Editar práctica"; $("fsave").textContent = "Guardar cambios"; $("fcancel").hidden = false;
+    $("form").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+
+  /* ---------- history ---------- */
+  function openHist(p) {
+    S.hist = true; S.hf = { mes: "", tema: "", estado: "" }; S.hsel = {}; S.hconf = null;
+    var el = $("hist");
+    var months = {}; S.rows.forEach(function (r) { if (r.prof === p.id) months[String(r.fecha).slice(0, 7)] = 1; });
+    var ms = Object.keys(months).sort().reverse();
+    var temas = TEMA_IDS.slice(); S.rows.forEach(function (r) { if (r.prof === p.id && temas.indexOf(r.tema) < 0) temas.push(r.tema); });
+    el.innerHTML = '<div class="hist" role="dialog" aria-modal="true" aria-labelledby="htitle">' +
+      '<div class="hhead"><div><div class="eyebrow">Historial de prácticas</div><h2 id="htitle">' + esc(p.nombre) + '</h2></div><button class="btn" id="hclose" type="button">Cerrar</button></div>' +
+      '<div class="hfilters">' +
+      '<label>Mes<select id="hf-mes"><option value="">Todos</option>' + ms.map(function (k) { var a = k.split("-"); return '<option value="' + k + '">' + MESES[+a[1] - 1] + " " + a[0] + "</option>"; }).join("") + "</select></label>" +
+      '<label>Tarea<select id="hf-tema"><option value="">Todas</option>' + temas.map(function (t) { return '<option value="' + esc(t) + '">' + esc(tm(t).n) + "</option>"; }).join("") + "</select></label>" +
+      '<label>Estado<select id="hf-estado"><option value="">Todos</option><option value="realizada">Realizada</option><option value="programada">Programada</option></select></label></div>' +
+      '<div class="hbar" id="hbar"></div><div class="list" id="hlist"></div></div>';
+    el.hidden = false;
+    $("hclose").onclick = closeHist;
+    el.onclick = function (e) { if (e.target === el) closeHist(); };
+    ["mes", "tema", "estado"].forEach(function (k) { $("hf-" + k).onchange = function () { S.hf[k] = this.value; S.hconf = null; paintHistList(); }; });
+    $("hbar").onclick = histAction; $("hlist").onclick = histAction;
+    $("hlist").onchange = function (e) { var c = e.target.closest("input[data-s]"); if (c) { if (c.checked) S.hsel[c.getAttribute("data-s")] = 1; else delete S.hsel[c.getAttribute("data-s")]; S.hconf = null; paintHistList(); } };
+    paintHistList(); $("hclose").focus();
+  }
+  function closeHist() { S.hist = false; S.hconf = null; var el = $("hist"); if (el) { el.hidden = true; el.innerHTML = ""; } }
+  function histRows(p) {
+    var f = S.hf;
+    return S.rows.filter(function (r) { return r.prof === p.id && (!f.mes || String(r.fecha).indexOf(f.mes) === 0) && (!f.tema || r.tema === f.tema) && (!f.estado || r.estado === f.estado); })
+      .sort(function (a, b) { return (a.fecha + a.inicio) < (b.fecha + b.inicio) ? 1 : -1; });
+  }
+  function paintHistList() {
+    var p = proById(S.tab); if (!p || !$("hlist")) return;
+    var rs = histRows(p), ids = {}; rs.forEach(function (r) { ids[r.id] = 1; });
+    Object.keys(S.hsel).forEach(function (k) { if (!ids[k]) delete S.hsel[k]; });
+    var n = Object.keys(S.hsel).length, tot = rs.reduce(function (a, r) { return a + (r.estado === "realizada" ? dur(r) : 0); }, 0);
+    var bar = '<span class="hcount">' + rs.length + (rs.length === 1 ? " práctica" : " prácticas") + (tot ? " · " + fmt(tot) + " realizadas" : "") + "</span><span class=\"sp\"></span>";
+    if (S.canWrite && rs.length) {
+      bar += '<label class="cb"><input type="checkbox" data-a="all"' + (n === rs.length ? " checked" : "") + '> Seleccionar todas</label>';
+      if (n) {
+        if (S.hconf === "bulk") bar += '<span>¿Eliminar ' + n + (n === 1 ? " práctica" : " prácticas") + "? No se puede deshacer.</span>" + '<button class="btn small danger" data-a="bulk-yes" type="button">Sí, eliminar</button><button class="btn small" data-a="conf-no" type="button">No</button>';
+        else bar += '<button class="btn small danger" data-a="bulk" type="button">Eliminar seleccionadas (' + n + ")</button>";
+      }
+    }
+    $("hbar").innerHTML = bar;
+    if (!rs.length) { $("hlist").innerHTML = '<div class="empty">No hay prácticas con estos filtros.</div>'; return; }
+    $("hlist").innerHTML = rs.map(function (x) {
+      var t = tm(x.tema), acts = "";
+      if (S.canWrite) {
+        if (S.hconf === x.id) acts = '<span>¿Eliminar?</span><button class="btn small danger" data-a="del-yes" data-id="' + x.id + '" type="button">Sí, eliminar</button><button class="btn small" data-a="conf-no" type="button">No</button>';
+        else acts = '<button class="btn small" data-a="edit" data-id="' + x.id + '" type="button">Editar</button><button class="btn small danger" data-a="del" data-id="' + x.id + '" type="button">Eliminar</button>';
+      }
+      var first = S.canWrite ? '<label class="cb"><input type="checkbox" data-s="' + x.id + '"' + (S.hsel[x.id] ? " checked" : "") + ' aria-label="Seleccionar práctica"><span>' + esc(longDate(x.fecha)) + "</span></label>" : esc(longDate(x.fecha));
+      return '<div class="row"><div class="d">' + first + "<small>" + esc(x.fecha.slice(0, 4)) + " · " + esc(x.inicio) + " – " + esc(x.fin) + '</small></div><div class="m">' +
+        '<span class="chip"><i style="background:' + t.c + '"></i>' + esc(t.n) + "</span><span>" + fmt(dur(x)) + '</span><span class="badge ' + (x.estado === "realizada" ? "done" : "plan") + '">' + (x.estado === "realizada" ? "Realizada" : "Programada") + "</span>" +
+        (x.nota ? '<span class="note">' + esc(x.nota) + "</span>" : "") + '</div><div class="act">' + acts + "</div></div>";
+    }).join("");
+  }
+  function histAction(e) {
+    var b = e.target.closest("[data-a]"); if (!b) return;
+    var a = b.getAttribute("data-a"), id = b.getAttribute("data-id"), p = proById(S.tab);
+    if (a === "all") { var rs = histRows(p); if (b.checked) rs.forEach(function (r) { S.hsel[r.id] = 1; }); else S.hsel = {}; S.hconf = null; paintHistList(); }
+    else if (a === "del") { S.hconf = id; paintHistList(); }
+    else if (a === "bulk") { S.hconf = "bulk"; paintHistList(); }
+    else if (a === "conf-no") { S.hconf = null; paintHistList(); }
+    else if (a === "del-yes") { S.hconf = null; remove(id).catch(function () {}); }
+    else if (a === "bulk-yes") {
+      var list = Object.keys(S.hsel); S.hsel = {}; S.hconf = null;
+      list.reduce(function (q, k) { return q.then(function () { return remove(k); }); }, Promise.resolve()).catch(function () {}).then(paintHistList);
+    }
+    else if (a === "edit") {
+      var x = S.rows.filter(function (r) { return r.id === id; })[0]; if (!x) return;
+      closeHist(); var d = parseYmd(x.fecha); S.y = d.getFullYear(); S.m = d.getMonth(); S.sel = x.fecha; S.confirmDel = null;
+      renderKeepForm(p); startEdit(id);
+    }
+  }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.hist) closeHist(); });
+
+  /* ---------- tooltip ---------- */
+  function showTip(el, list) {
+    var tip = $("tip");
+    if (!list || !list.length) { tip.hidden = true; return; }
+    var k = el.getAttribute("data-d");
+    tip.innerHTML = "<b>" + esc(longDate(k)) + "</b>" + list.slice().sort(function (a, b) { return a.inicio < b.inicio ? -1 : 1; }).map(function (x) {
+      var t = tm(x.tema).n;
+      return "<div>" + esc(x.inicio) + " a " + esc(x.fin) + " · " + esc(t) + " · " + fmt(dur(x)) + (x.estado === "programada" ? " (programada)" : "") + "</div>";
+    }).join("");
+    tip.hidden = false;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8);
+    var top = r.top - h - 8; if (top < 8) top = r.bottom + 8;
+    tip.style.left = left + "px"; tip.style.top = top + "px";
+  }
+  function hideTip() { $("tip").hidden = true; }
+  window.addEventListener("scroll", hideTip, true);
+
+  /* ---------- boot ---------- */
+  window.addEventListener("hashchange", route);
+  document.addEventListener("click", function (e) { if (S.menu && e.target.isConnected && !e.target.closest("#tmenu") && !e.target.closest("#tbtn")) { S.menu = false; syncMenu(); } });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && S.menu) { S.menu = false; syncMenu(); var b = $("tbtn"); if (b) b.focus(); } });
+  setStatus(); route();
+
+  (async function () {
+    try {
+      var user = window.claude && await window.claude.use("user");
+      S.recheck = async function () {
+        var u = window.claude && await window.claude.use("user");
+        if (!u) { S.diag = "Sin sesión detectada."; route(); return; }
+        var w = await u.can("data.write"), ed = await u.canEdit();
+        S.canWrite = w !== false; S.canTasks = ed !== false;
+        S.diag = "Permiso de escritura: " + String(w) + " · edición: " + String(ed);
+        setStatus(); route();
+      };
+      if (user) { var cw = await user.can("data.write"); if (cw === false) S.canWrite = false; var ce = await user.canEdit(); if (ce === false) S.canTasks = false; S.diag = "Permiso de escritura: " + String(cw) + " · edición: " + String(ce);
+        try {
+          var me = await user.me(), who = $("who");
+          who.textContent = "Sesión: " + (me.email || me.name || "cuenta sin identificar") + " · " + (ce === true ? "Editor" : cw === true ? "Colaborador" : "Solo lectura") + " · ";
+          var a = document.createElement("a"); a.href = "#"; a.textContent = "Cerrar sesión"; a.onclick = function (ev) { ev.preventDefault(); window.__signOut(); };
+          who.appendChild(a); who.hidden = false;
+        } catch (e2) {}
+      } else { S.diag = "Sin sesión detectada."; }
+    } catch (e) {}
+    try {
+      var db = window.claude && await window.claude.use("db");
+      if (db) {
+        S.db = db; S.col = db.collection("practicas");
+        db.collection("asignaciones").onSnapshot(function (snap) {
+          var m = {}; snap.docs.forEach(function (d) { var t = d.data().temas; if (Array.isArray(t)) m[d.id] = t; });
+          S.asig = m; paint();
+        }, function () {});
+        S.col.onSnapshot(function (snap) {
+          S.rows = snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); });
+          paint();
+        }, function () { S.db = null; setStatus(); });
+      }
+    } catch (e) { S.db = null; }
+    setStatus(); route();
+  })();
+}
+</script>
+</body>
+</html>
